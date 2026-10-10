@@ -6,13 +6,7 @@ struct NotchRootView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            UnevenRoundedRectangle(
-                topLeadingRadius: 0,
-                bottomLeadingRadius: cornerRadius,
-                bottomTrailingRadius: cornerRadius,
-                topTrailingRadius: 0
-            )
-            .fill(Color(white: 0.02))
+            panelBackground
 
             Group {
                 switch viewModel.state {
@@ -32,6 +26,31 @@ struct NotchRootView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onHover { viewModel.setHovering($0) }
         .animation(.easeOut(duration: 0.18), value: viewModel.state)
+        // Cam (Material) her zaman koyu görünsün; açık sistem temasında beyaza dönmesin.
+        .preferredColorScheme(.dark)
+    }
+
+    private var panelShape: UnevenRoundedRectangle {
+        UnevenRoundedRectangle(
+            topLeadingRadius: 0,
+            bottomLeadingRadius: cornerRadius,
+            bottomTrailingRadius: cornerRadius,
+            topTrailingRadius: 0
+        )
+    }
+
+    @ViewBuilder
+    private var panelBackground: some View {
+        if case .idle = viewModel.state {
+            // Çentiğin üzerinde: mat siyah — kamera bölmesiyle bütünleşik kalmalı.
+            panelShape.fill(Color(white: 0.02))
+        } else {
+            // Açık durum: koyu cam + hafif karartma + ince border.
+            panelShape
+                .fill(.regularMaterial)
+                .overlay(panelShape.fill(Color.black.opacity(0.30)))
+                .overlay(panelShape.strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5))
+        }
     }
 
     private var cornerRadius: CGFloat {

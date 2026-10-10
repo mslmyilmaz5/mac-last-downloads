@@ -58,7 +58,8 @@ final class NotchPanelController: NSObject {
         panel.level = .statusBar
         panel.backgroundColor = .clear
         panel.isOpaque = false
-        panel.hasShadow = false
+        // Borderless pencerede gölge, içeriğin (yuvarlatılmış şeklin) silüetini takip eder.
+        panel.hasShadow = true
         panel.hidesOnDeactivate = false
         panel.isMovable = false
         panel.ignoresMouseEvents = false
@@ -94,6 +95,7 @@ final class NotchPanelController: NSObject {
         } else {
             panel.setFrame(target, display: true)
         }
+        panel.invalidateShadow()
     }
 
     private func frame(for state: NotchViewModel.PanelState, notch: NotchInfo) -> CGRect {
