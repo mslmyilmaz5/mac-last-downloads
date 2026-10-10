@@ -35,6 +35,22 @@ install: app
 	@cp -R "$(APP_DIR)" /Applications/
 	@echo "✓ /Applications/$(APP_NAME).app kuruldu"
 
+## Dağıtım için ZIP paketi üretir (dist/NotchDownloads.zip)
+package: app
+	@rm -f "$(DIST_DIR)/$(APP_NAME).zip"
+	@ditto -c -k --sequesterRsrc --keepParent "$(APP_DIR)" "$(DIST_DIR)/$(APP_NAME).zip"
+	@echo "✓ $(DIST_DIR)/$(APP_NAME).zip hazır"
+
+## Dağıtım için DMG üretir (dist/NotchDownloads.dmg, Applications kısayollu)
+dmg: app
+	@rm -rf "$(DIST_DIR)/dmg-staging" "$(DIST_DIR)/$(APP_NAME).dmg"
+	@mkdir -p "$(DIST_DIR)/dmg-staging"
+	@cp -R "$(APP_DIR)" "$(DIST_DIR)/dmg-staging/"
+	@ln -s /Applications "$(DIST_DIR)/dmg-staging/Applications"
+	@hdiutil create -volname "$(APP_NAME)" -srcfolder "$(DIST_DIR)/dmg-staging" -ov -format UDZO "$(DIST_DIR)/$(APP_NAME).dmg" >/dev/null
+	@rm -rf "$(DIST_DIR)/dmg-staging"
+	@echo "✓ $(DIST_DIR)/$(APP_NAME).dmg hazır"
+
 uninstall:
 	@killall $(APP_NAME) 2>/dev/null || true
 	@rm -rf "/Applications/$(APP_NAME).app"
