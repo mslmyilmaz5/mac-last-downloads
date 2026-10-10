@@ -3,6 +3,26 @@
 MacBook'un çentiğinin (notch) altına yerleşen, **son 5 indirilen dosyayı** gösteren
 küçük bir macOS uygulaması.
 
+## İndir
+
+Hazır uygulama: **[Son sürümü indir](https://github.com/mslmyilmaz5/mac-last-downloads/releases/latest)**
+
+| Dosya | Link |
+| --- | --- |
+| DMG (önerilen) | [NotchDownloads.dmg](https://github.com/mslmyilmaz5/mac-last-downloads/releases/latest/download/NotchDownloads.dmg) |
+| ZIP | [NotchDownloads.zip](https://github.com/mslmyilmaz5/mac-last-downloads/releases/latest/download/NotchDownloads.zip) |
+
+**Kurulum:** DMG/ZIP'i açın, uygulamayı `/Applications` klasörüne sürükleyin.
+İlk açılışta **sağ tık → Aç** deyin. "Bozuk olduğu için açılamıyor" uyarısı
+çıkarsa Terminal'e şunu yazın:
+
+```sh
+xattr -cr /Applications/NotchDownloads.app
+```
+
+(Uygulama Apple Developer ID ile imzalanmadığı için Gatekeeper uyarısı normaldir.)
+Ardından gelen İndirilenler klasörü iznini **İzin Ver** ile onaylayın.
+
 ## Özellikler
 
 - **Çentik altında ince bir "çene"**: Boştayken çentiğin doğal bir uzantısı gibi durur,
