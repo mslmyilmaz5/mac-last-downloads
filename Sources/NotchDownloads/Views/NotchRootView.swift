@@ -35,15 +35,23 @@ struct NotchRootView: View {
     }
 
     private var cornerRadius: CGFloat {
-        if case .idle = viewModel.state { return 6 }
+        if case .idle = viewModel.state { return 7 }
         return 14
     }
 
-    /// Kapalıyken görünmez ama tıklanabilir/hover alınabilir ince çene.
+    /// Kapalı durum: pencere çentiği kaplar (siyah üstüne siyah, görünmez);
+    /// yalnızca alttaki dilimde küçük bir indirme ikonu görünür.
     private var idleContent: some View {
-        Color.clear
-            .contentShape(Rectangle())
-            .onTapGesture { viewModel.expand() }
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            Image(systemName: "arrow.down")
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(.white.opacity(0.5))
+                .frame(height: NotchLayout.idleChinHeight)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .contentShape(Rectangle())
+        .onTapGesture { viewModel.expand() }
     }
 }
 

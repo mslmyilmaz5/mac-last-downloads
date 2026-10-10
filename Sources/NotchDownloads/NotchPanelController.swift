@@ -101,9 +101,17 @@ final class NotchPanelController: NSObject {
 
         switch state {
         case .idle:
-            let size = notch.hasPhysicalNotch
-                ? CGSize(width: notch.notchWidth, height: NotchLayout.idleChinHeight)
-                : NotchLayout.fallbackChinSize
+            if notch.hasPhysicalNotch {
+                // Çentiğin üzerine bin (siyah üstüne siyah = görünmez) ve altına
+                // küçük bir dilim sarkıt → çentikle tek parça hissi.
+                return CGRect(
+                    x: notch.notchRect.minX,
+                    y: notch.notchRect.minY - NotchLayout.idleChinHeight,
+                    width: notch.notchRect.width,
+                    height: notch.notchRect.height + NotchLayout.idleChinHeight
+                )
+            }
+            let size = NotchLayout.fallbackChinSize
             return CGRect(
                 x: notch.centerX - size.width / 2,
                 y: topY - size.height,

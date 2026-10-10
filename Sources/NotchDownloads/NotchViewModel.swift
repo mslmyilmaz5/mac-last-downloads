@@ -8,8 +8,8 @@ enum NotchLayout {
     static let verticalPadding: CGFloat = 16
     static let expandedWidth: CGFloat = 460
     static let peekSize = CGSize(width: 340, height: 60)
-    static let idleChinHeight: CGFloat = 12
-    static let fallbackChinSize = CGSize(width: 120, height: 8)
+    static let idleChinHeight: CGFloat = 14
+    static let fallbackChinSize = CGSize(width: 140, height: idleChinHeight)
 }
 
 /// Uygulamanın tüm UI durumunu yönetir: dosya listesi, panel durumu ve dosya aksiyonları.
@@ -127,7 +127,7 @@ final class NotchViewModel: ObservableObject {
             if state == .idle {
                 // Yanlışlıkla geçişlerde açılmaması için kısa bir gecikme.
                 expandTask = Task { [weak self] in
-                    try? await Task.sleep(nanoseconds: 120_000_000)
+                    try? await Task.sleep(nanoseconds: 160_000_000)
                     guard !Task.isCancelled, let self, self.isHovering, self.state == .idle else { return }
                     self.expand()
                 }
