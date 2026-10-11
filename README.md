@@ -3,6 +3,8 @@
 MacBook'un çentiğinin (notch) altına yerleşen, **son 5 indirilen dosyayı** gösteren
 küçük bir macOS uygulaması.
 
+![Notch Downloads demo](docs/demo.gif)
+
 ## İndir
 
 Hazır uygulama: **[Son sürümü indir](https://github.com/mslmyilmaz5/mac-last-downloads/releases/latest)**
@@ -30,8 +32,8 @@ Ardından gelen İndirilenler klasörü iznini **İzin Ver** ile onaylayın.
 - **Anlık bildirim**: Yeni bir dosya indiğinde çentiğin altında birkaç saniyelik
   önizleme bandı belirir.
 - **Son 5 dosya**: İndirilme tarihine göre sıralı, gerçek dosya ikonlarıyla.
-- **Sürükle & bırak**: Satırı tutup Finder'a, masaüstüne veya herhangi bir
-  uygulamaya sürükleyebilirsiniz.
+- **Sürükle & bırak**: Satırı — ya da yeni dosya bildirimini, listeyi açmadan —
+  tutup Finder'a, terminale veya herhangi bir uygulamaya sürükleyebilirsiniz.
 - **Hızlı aksiyonlar**: Satırın üzerine gelince Finder'da Göster, Kopyala, Paylaş,
   Çöp Kutusuna Taşı düğmeleri belirir. Sağ tık menüsünde de tüm aksiyonlar vardır.
 - **Yarım indirmeleri gizler**: `.download`, `.crdownload`, `.part` gibi devam eden
@@ -46,6 +48,7 @@ Ardından gelen İndirilenler klasörü iznini **İzin Ver** ile onaylayın.
 ## Gereksinimler
 
 - macOS 13 Ventura veya üzeri
+- Apple Silicon (M1 ve sonrası) — hazır sürüm yalnızca `arm64` için derlenir
 - Swift toolchain (Xcode Command Line Tools yeterli): `xcode-select --install`
 
 ## Çalıştırma
@@ -91,6 +94,7 @@ make uninstall
 | Dosya | Görev |
 | --- | --- |
 | `DownloadsMonitor.swift` | `~/Downloads` klasörünü `DispatchSource` (vnode) ile izler, son 5 dosyayı çıkarır |
+| `ScreenshotSettings.swift` | Ekran görüntüsü klasörü ve `show-thumbnail` ayarı (`com.apple.screencapture`) |
 | `NotchGeometry.swift` | Çentiğin ekran koordinatlarını hesaplar (`auxiliaryTopLeftArea` / `safeAreaInsets`) |
 | `NotchViewModel.swift` | UI durumu (çene / bildirim / liste) + dosya aksiyonları |
 | `NotchPanelController.swift` | Odak çalmayan `NSPanel`'i çentiğin altına konumlandırır, animasyonları yönetir |
@@ -98,3 +102,7 @@ make uninstall
 | `AppDelegate.swift` | Menü çubuğu ikonu, oturumda başlat (SMAppService) |
 
 Klasör erişimi sandbox'sız çalışır; TCC ("İndirilenler" izni) ilk açılışta sorulur.
+
+## Lisans
+
+[MIT](LICENSE)
