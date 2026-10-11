@@ -120,6 +120,13 @@ final class NotchViewModel: ObservableObject {
         scheduleCollapse(after: 8)
     }
 
+    /// Sürükleme sırasında panel küçülmesin (küçülürse sürükleme yarıda kesilir).
+    /// Fare panelden çıkınca `setHovering(false)` normal kapanma sürecini başlatır.
+    func dragStarted() {
+        autoCollapseTask?.cancel()
+        scheduleCollapse(after: 10)
+    }
+
     func setHovering(_ hovering: Bool) {
         guard hovering != isHovering else { return }
         isHovering = hovering

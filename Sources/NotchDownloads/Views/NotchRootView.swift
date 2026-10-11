@@ -16,6 +16,10 @@ struct NotchRootView: View {
                     PeekView(file: file)
                         .contentShape(Rectangle())
                         .onTapGesture { viewModel.expand() }
+                        .onDrag {
+                            viewModel.dragStarted()
+                            return file.dragItemProvider()
+                        }
                 case .expanded:
                     ExpandedListView(viewModel: viewModel)
                 }

@@ -1,5 +1,6 @@
 import Foundation
 import Darwin
+import UniformTypeIdentifiers
 
 /// İndirilenler klasöründeki tek bir dosyayı temsil eder.
 struct DownloadedFile: Identifiable, Hashable {
@@ -38,6 +39,20 @@ struct DownloadedFile: Identifiable, Hashable {
     }
 
     /// Son 2 dakika içinde eklenmişse "yeni" sayılır.
+    /// Sürükleme için öğe sağlayıcı. URL'yi dosya temsili yerine `public.file-url` verisi olarak
+    /// verir; aksi halde SwiftUI dosyanın geçici bir kopyasını (~/Library/Caches/...SwiftUI.Drag-...)
+    /// sürükler ve hedef uygulama asıl yolu değil o kopyanın yolunu alır.
+    func dragItemProvider() -> NSItemProvider {
+        let provider = NSItemProvider()
+        let data = url.dataRepresentation
+        provider.registerDataRepresentation(forTypeIdentifier: UTType.fileURL.identifier, visibility: .all) { completion in
+            completion(data, nil)
+            return nil
+        }
+        provider.suggestedName = name
+        return provider
+    }
+
     var isScreenshot: Bool { ScreenshotSettings.isScreenshotName(name) }
 
     var isRecent: Bool {

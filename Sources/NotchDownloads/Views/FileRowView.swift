@@ -79,7 +79,7 @@ struct FileRowView: View {
             viewModel.open(file)
         }
         .onDrag {
-            NSItemProvider(object: file.url as NSURL)
+            file.dragItemProvider()
         }
         .contextMenu {
             Button("Aç") { viewModel.open(file) }
