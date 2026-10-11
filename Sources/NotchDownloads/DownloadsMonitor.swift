@@ -101,7 +101,12 @@ final class DownloadsMonitor {
     }
 
     func refresh() {
-        scheduleRescan()
+        // İzin başta reddedildiyse kaynak hiç kurulmamıştır; yeniden izlemeyi başlat.
+        if source == nil {
+            start()
+        } else {
+            scheduleRescan()
+        }
     }
 
     /// Ardışık olayları (tek indirmede düzinelerce vnode eventi gelir) tek taramaya indirger.

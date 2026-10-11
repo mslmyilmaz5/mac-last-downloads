@@ -82,7 +82,9 @@ final class NotchViewModel: ObservableObject {
         // İlk açılışta bildirim gösterme; sadece gerçekten yeni bir dosya geldiğinde göster.
         guard !isInitialLoad,
               let top = newFiles.first,
-              top.id != previousTop?.id else { return }
+              top.id != previousTop?.id,
+              // Üstteki dosya silinince alttaki eski dosya "yeni indirildi" diye gösterilmesin.
+              previousTop == nil || top.addedDate > previousTop!.addedDate else { return }
 
         dlog("ViewModel: yeni dosya → \(top.name)")
 

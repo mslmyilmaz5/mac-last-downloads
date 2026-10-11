@@ -4,7 +4,7 @@ DIST_DIR    := dist
 APP_DIR     := $(DIST_DIR)/$(APP_NAME).app
 BINARY      := $(BUILD_DIR)/release/$(APP_NAME)
 
-.PHONY: build app run dev install uninstall clean
+.PHONY: build app run dev install uninstall package dmg clean
 
 build:
 	swift build -c release
