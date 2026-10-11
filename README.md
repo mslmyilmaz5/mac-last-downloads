@@ -5,6 +5,8 @@ küçük bir macOS uygulaması.
 
 ![Notch Downloads demo](docs/demo.gif)
 
+▶️ [Demo videosunu izle (MP4, 28 sn)](https://github.com/mslmyilmaz5/mac-last-downloads/releases/download/v1.1.0/NotchDownloads-demo.mp4)
+
 ## İndir
 
 Hazır uygulama: **[Son sürümü indir](https://github.com/mslmyilmaz5/mac-last-downloads/releases/latest)**
