@@ -36,6 +36,10 @@ Ardından gelen İndirilenler klasörü iznini **İzin Ver** ile onaylayın.
   Çöp Kutusuna Taşı düğmeleri belirir. Sağ tık menüsünde de tüm aksiyonlar vardır.
 - **Yarım indirmeleri gizler**: `.download`, `.crdownload`, `.part` gibi devam eden
   indirmeler listede görünmez; dosya tamamlanınca belirir.
+- **Ekran görüntüleri**: macOS'un ekran görüntüsü klasörü (varsayılan Masaüstü) de izlenir;
+  yalnızca ekran görüntüsü/kaydı dosyaları listeye girer. Menüden **"Ekran Görüntülerini
+  Anında Göster"** açılırsa sistemin yüzen küçük resmi kapatılır ve görüntü çekildiği anda
+  çentikte belirir. (Masaüstü izni de istenir.)
 - **Menü çubuğu ikonu**: Paneli açma, oturum açılışında başlatma, çıkış.
 - Çentiksiz ekranlarda (harici monitör) menü çubuğunun altına ortalanmış olarak çalışır.
 

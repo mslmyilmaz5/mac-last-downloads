@@ -88,7 +88,7 @@ struct PeekView: View {
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .truncationMode(.middle)
-                Text("İndirildi · \(file.formattedSize)")
+                Text("\(file.isScreenshot ? "Ekran görüntüsü" : "İndirildi") · \(file.formattedSize)")
                     .font(.system(size: 10.5))
                     .foregroundStyle(.white.opacity(0.55))
                     .lineLimit(1)

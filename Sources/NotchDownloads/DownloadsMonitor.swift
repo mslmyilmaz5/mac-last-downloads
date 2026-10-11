@@ -38,6 +38,8 @@ struct DownloadedFile: Identifiable, Hashable {
     }
 
     /// Son 2 dakika içinde eklenmişse "yeni" sayılır.
+    var isScreenshot: Bool { ScreenshotSettings.isScreenshotName(name) }
+
     var isRecent: Bool {
         Date().timeIntervalSince(addedDate) < 120
     }
@@ -55,6 +57,9 @@ final class DownloadsMonitor {
     private let limit: Int
     private var source: DispatchSourceFileSystemObject?
     private var fileDescriptor: Int32 = -1
+    /// Ekran görüntüsü klasörü İndirilenler'den farklıysa onu da izleriz (yalnızca `queue` üzerinde dokunulur).
+    private var screenshotURL: URL?
+    private var screenshotSource: DispatchSourceFileSystemObject?
     private let queue = DispatchQueue(label: "notchdownloads.monitor", qos: .utility)
     private var debounceWorkItem: DispatchWorkItem?
 
@@ -98,6 +103,11 @@ final class DownloadsMonitor {
         source?.cancel()
         source = nil
         fileDescriptor = -1
+        queue.async { [weak self] in
+            self?.screenshotSource?.cancel()
+            self?.screenshotSource = nil
+            self?.screenshotURL = nil
+        }
     }
 
     func refresh() {
@@ -119,9 +129,35 @@ final class DownloadsMonitor {
         queue.asyncAfter(deadline: .now() + 0.25, execute: work)
     }
 
+    /// Ekran görüntüsü klasörünü (ayar değişmiş olabilir) izlemeye alır / bırakır.
+    private func syncScreenshotSource() {
+        let location = ScreenshotSettings.location.standardizedFileURL
+        let wanted: URL? = location == directoryURL.standardizedFileURL ? nil : location
+        guard wanted != screenshotURL else { return }
+
+        screenshotSource?.cancel()
+        screenshotSource = nil
+        screenshotURL = nil
+        guard let wanted else { return }
+
+        let fd = open(wanted.path, O_EVTONLY)
+        guard fd >= 0 else { return } // İzin yok: sessizce geç, sonraki taramada tekrar dene.
+        let source = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: fd,
+            eventMask: [.write, .rename, .delete, .attrib, .extend],
+            queue: queue
+        )
+        source.setEventHandler { [weak self] in self?.scheduleRescan() }
+        source.setCancelHandler { close(fd) }
+        screenshotSource = source
+        screenshotURL = wanted
+        source.resume()
+    }
+
     private func rescan() {
+        syncScreenshotSource()
         do {
-            let files = try Self.scan(directoryURL, limit: limit)
+            let files = try Self.scan(directoryURL, limit: limit, screenshotDirectory: screenshotURL)
             dlog("Monitor: \(files.count) dosya bulundu: \(files.map(\.name))")
             DispatchQueue.main.async { [weak self] in
                 self?.onChange?(files)
@@ -136,20 +172,35 @@ final class DownloadsMonitor {
         }
     }
 
-    static func scan(_ directoryURL: URL, limit: Int) throws -> [DownloadedFile] {
+    static func scan(
+        _ directoryURL: URL,
+        limit: Int,
+        screenshotDirectory: URL? = nil
+    ) throws -> [DownloadedFile] {
+        let keys: [URLResourceKey] = [
+            .fileSizeKey, .isDirectoryKey,
+            .addedToDirectoryDateKey, .creationDateKey, .contentModificationDateKey
+        ]
         let urls = try FileManager.default.contentsOfDirectory(
             at: directoryURL,
-            includingPropertiesForKeys: [
-                .fileSizeKey, .isDirectoryKey,
-                .addedToDirectoryDateKey, .creationDateKey, .contentModificationDateKey
-            ],
+            includingPropertiesForKeys: keys,
             options: [.skipsHiddenFiles]
         )
 
-        let filtered = urls.filter { url in
+        var filtered = urls.filter { url in
             if url.lastPathComponent.hasPrefix(".") { return false }
             if skippedExtensions.contains(url.pathExtension.lowercased()) { return false }
             return true
+        }
+
+        // Masaüstü vb. klasörden sadece ekran görüntüleri alınır.
+        if let screenshotDirectory,
+           let extra = try? FileManager.default.contentsOfDirectory(
+               at: screenshotDirectory,
+               includingPropertiesForKeys: keys,
+               options: [.skipsHiddenFiles]
+           ) {
+            filtered += extra.filter { ScreenshotSettings.isScreenshotName($0.lastPathComponent) }
         }
 
         return filtered

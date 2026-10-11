@@ -26,6 +26,10 @@
 	<true/>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>Masaüstüne kaydedilen ekran görüntülerini çentiğin altında gösterebilmek için Masaüstü klasörüne erişim gerekiyor.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Belgeler klasörüne kaydedilen ekran görüntülerini çentiğin altında gösterebilmek için erişim gerekiyor.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
 	<string>Son indirilen dosyaları çentiğin altında gösterebilmek için İndirilenler klasörüne erişim gerekiyor.</string>
 </dict>

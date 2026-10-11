@@ -8,6 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var launchAtLoginItem: NSMenuItem!
     private var permissionItem: NSMenuItem!
+    private var instantScreenshotItem: NSMenuItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         viewModel = NotchViewModel()
@@ -51,6 +52,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(permissionItem)
 
         menu.addItem(.separator())
+
+        instantScreenshotItem = NSMenuItem(
+            title: "Ekran Görüntülerini Anında Göster",
+            action: #selector(toggleInstantScreenshots),
+            keyEquivalent: ""
+        )
+        instantScreenshotItem.target = self
+        instantScreenshotItem.toolTip = "Sistemin yüzen küçük resmini kapatır; ekran görüntüsü çekilir çekilmez kaydedilir ve burada belirir."
+        menu.addItem(instantScreenshotItem)
 
         launchAtLoginItem = NSMenuItem(
             title: "Oturum Açılışında Başlat",
@@ -97,6 +107,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.terminate(nil)
     }
 
+    @objc private func toggleInstantScreenshots() {
+        ScreenshotSettings.setInstantSave(!ScreenshotSettings.isInstantSaveEnabled)
+    }
+
     @objc private func toggleLaunchAtLogin() {
         do {
             if SMAppService.mainApp.status == .enabled {
@@ -117,6 +131,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate: NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
+        instantScreenshotItem.state = ScreenshotSettings.isInstantSaveEnabled ? .on : .off
         launchAtLoginItem.state = SMAppService.mainApp.status == .enabled ? .on : .off
         permissionItem.isHidden = !viewModel.permissionDenied
     }
