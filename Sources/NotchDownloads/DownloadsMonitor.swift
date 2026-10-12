@@ -28,12 +28,13 @@ struct DownloadedFile: Identifiable, Hashable {
     }
 
     var formattedSize: String {
-        if isDirectory { return "Klasör" }
+        if isDirectory { return "Folder" }
         return ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
     }
 
     var relativeDate: String {
         let formatter = RelativeDateTimeFormatter()
+        formatter.locale = Locale(identifier: "en_US")
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: addedDate, relativeTo: Date())
     }
@@ -173,12 +174,12 @@ final class DownloadsMonitor {
         syncScreenshotSource()
         do {
             let files = try Self.scan(directoryURL, limit: limit, screenshotDirectory: screenshotURL)
-            dlog("Monitor: \(files.count) dosya bulundu: \(files.map(\.name))")
+            dlog("Monitor: found \(files.count) files: \(files.map(\.name))")
             DispatchQueue.main.async { [weak self] in
                 self?.onChange?(files)
             }
         } catch let error as NSError {
-            dlog("Monitor: tarama hatası \(error.domain) \(error.code)")
+            dlog("Monitor: scan failed \(error.domain) \(error.code)")
             if error.domain == NSCocoaErrorDomain && error.code == NSFileReadNoPermissionError {
                 DispatchQueue.main.async { [weak self] in
                     self?.onPermissionDenied?()

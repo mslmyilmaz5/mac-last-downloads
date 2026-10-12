@@ -35,7 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.delegate = self
 
         let showItem = NSMenuItem(
-            title: "İndirilenleri Göster",
+            title: "Show Downloads",
             action: #selector(showPanel),
             keyEquivalent: ""
         )
@@ -43,7 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(showItem)
 
         permissionItem = NSMenuItem(
-            title: "İndirilenlere Erişim İzni Ver…",
+            title: "Allow Downloads Access…",
             action: #selector(openPrivacySettings),
             keyEquivalent: ""
         )
@@ -54,16 +54,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
 
         instantScreenshotItem = NSMenuItem(
-            title: "Ekran Görüntülerini Anında Göster",
+            title: "Show Screenshots Instantly",
             action: #selector(toggleInstantScreenshots),
             keyEquivalent: ""
         )
         instantScreenshotItem.target = self
-        instantScreenshotItem.toolTip = "Sistemin yüzen küçük resmini kapatır; ekran görüntüsü çekilir çekilmez kaydedilir ve burada belirir."
+        instantScreenshotItem.toolTip = "Turns off the system floating thumbnail so a screenshot is saved and appears here as soon as you take it."
         menu.addItem(instantScreenshotItem)
 
         launchAtLoginItem = NSMenuItem(
-            title: "Oturum Açılışında Başlat",
+            title: "Launch at Login",
             action: #selector(toggleLaunchAtLogin),
             keyEquivalent: ""
         )
@@ -73,7 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
 
         let downloadsItem = NSMenuItem(
-            title: "İndirilenler Klasörünü Aç",
+            title: "Open Downloads Folder",
             action: #selector(openDownloads),
             keyEquivalent: ""
         )
@@ -81,7 +81,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(downloadsItem)
 
         let quitItem = NSMenuItem(
-            title: "Notch Downloads'tan Çık",
+            title: "Quit Notch Downloads",
             action: #selector(quit),
             keyEquivalent: "q"
         )
@@ -120,8 +120,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         } catch {
             let alert = NSAlert()
-            alert.messageText = "Oturum açılışı ayarlanamadı"
-            alert.informativeText = "Bu özellik yalnızca uygulama .app paketi olarak çalıştırıldığında kullanılabilir. (`make run` ile başlatın.)\n\n\(error.localizedDescription)"
+            alert.messageText = "Couldn’t Set Launch at Login"
+            alert.informativeText = "This option is only available when the app is running as an .app bundle. Launch it with `make run`.\n\n\(error.localizedDescription)"
             alert.alertStyle = .warning
             NSApp.activate(ignoringOtherApps: true)
             alert.runModal()

@@ -9,14 +9,17 @@ enum NotchLayout {
     static let expandedWidth: CGFloat = 460
     static let peekSize = CGSize(width: 340, height: 60)
     static let idleChinHeight: CGFloat = 14
+    /// Hover'da çene bir miktar uzar; liste açılmaz.
+    static let idleChinHoverHeight: CGFloat = 26
     static let fallbackChinSize = CGSize(width: 140, height: idleChinHeight)
+    static let openCornerRadius: CGFloat = 18
 }
 
 /// Uygulamanın tüm UI durumunu yönetir: dosya listesi, panel durumu ve dosya aksiyonları.
 @MainActor
 final class NotchViewModel: ObservableObject {
     enum PanelState: Hashable {
-        /// Çentiğin altında ince siyah "çene" — her zaman görünür, hover ile genişler.
+        /// Çentiğin altında ince siyah "çene" — her zaman görünür, tıklayınca genişler.
         case idle
         /// Yeni dosya indiğinde birkaç saniyeliğine görünen bildirim bandı.
         case peek(DownloadedFile)
@@ -25,18 +28,26 @@ final class NotchViewModel: ObservableObject {
     }
 
     @Published private(set) var files: [DownloadedFile] = [] {
-        didSet { onLayoutChange?() }
+        didSet { notifyLayout() }
     }
     @Published private(set) var state: PanelState = .idle {
-        didSet { onLayoutChange?() }
+        didSet { notifyLayout() }
+    }
+    @Published private(set) var isHovering = false {
+        didSet {
+            guard isHovering != oldValue, case .idle = state else { return }
+            notifyLayout(duration: 0.2)
+        }
     }
     @Published var permissionDenied = false {
-        didSet { onLayoutChange?() }
+        didSet { notifyLayout() }
     }
 
     /// Yerleşimi etkileyen bir değer değiştikten SONRA çağrılır (@Published willSet
     /// zamanlamasına takılmamak için didSet üzerinden). Panel controller buradan haberdar olur.
     var onLayoutChange: (() -> Void)?
+    /// Bir sonraki yerleşim animasyonunun süresi. Hover kısa, açılma daha yavaş.
+    var layoutDuration: TimeInterval = 0.32
 
     /// Paylaş menüsünün konumlanacağı görünüm (panel içeriği).
     weak var shareAnchor: NSView?
@@ -44,9 +55,16 @@ final class NotchViewModel: ObservableObject {
     let downloadsURL: URL
     private let monitor: DownloadsMonitor
     private var hasLoadedOnce = false
-    private var isHovering = false
     private var autoCollapseTask: Task<Void, Never>?
-    private var expandTask: Task<Void, Never>?
+
+    var chinHeight: CGFloat {
+        isHovering ? NotchLayout.idleChinHoverHeight : NotchLayout.idleChinHeight
+    }
+
+    private func notifyLayout(duration: TimeInterval = 0.32) {
+        layoutDuration = duration
+        onLayoutChange?()
+    }
 
     init(monitor: DownloadsMonitor = DownloadsMonitor()) {
         self.monitor = monitor
@@ -77,7 +95,7 @@ final class NotchViewModel: ObservableObject {
         permissionDenied = false
 
         files = newFiles
-        dlog("ViewModel: liste güncellendi (\(newFiles.count) dosya, initial=\(isInitialLoad))")
+        dlog("ViewModel: list updated (\(newFiles.count) files, initial=\(isInitialLoad))")
 
         // İlk açılışta bildirim gösterme; sadece gerçekten yeni bir dosya geldiğinde göster.
         guard !isInitialLoad,
@@ -86,17 +104,13 @@ final class NotchViewModel: ObservableObject {
               // Üstteki dosya silinince alttaki eski dosya "yeni indirildi" diye gösterilmesin.
               previousTop == nil || top.addedDate > previousTop!.addedDate else { return }
 
-        dlog("ViewModel: yeni dosya → \(top.name)")
+        dlog("ViewModel: new file → \(top.name)")
 
         switch state {
         case .expanded:
             break // Kullanıcı zaten listeye bakıyor.
         case .idle, .peek:
-            if isHovering {
-                expand()
-            } else {
-                showPeek(for: top)
-            }
+            showPeek(for: top)
         }
     }
 
@@ -109,7 +123,6 @@ final class NotchViewModel: ObservableObject {
     }
 
     func expand() {
-        expandTask?.cancel()
         autoCollapseTask?.cancel()
         state = .expanded
     }
@@ -132,17 +145,9 @@ final class NotchViewModel: ObservableObject {
         isHovering = hovering
 
         if hovering {
+            // Fare üzerindeyken kapanmasın; açılma tıklamayla olur.
             autoCollapseTask?.cancel()
-            if state == .idle {
-                // Yanlışlıkla geçişlerde açılmaması için kısa bir gecikme.
-                expandTask = Task { [weak self] in
-                    try? await Task.sleep(nanoseconds: 160_000_000)
-                    guard !Task.isCancelled, let self, self.isHovering, self.state == .idle else { return }
-                    self.expand()
-                }
-            }
         } else {
-            expandTask?.cancel()
             switch state {
             case .expanded: scheduleCollapse(after: 0.5)
             case .peek: scheduleCollapse(after: 1.0)

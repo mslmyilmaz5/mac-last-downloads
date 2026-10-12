@@ -16,7 +16,7 @@ enum NotchGeometry {
     /// Panelin tutunacağı ekranı ve çentik konumunu hesaplar.
     static func current() -> NotchInfo? {
         guard let screen = preferredScreen() else {
-            dlog("NotchGeometry: ekran bulunamadı")
+            dlog("NotchGeometry: no screen")
             return nil
         }
 
@@ -35,7 +35,7 @@ enum NotchGeometry {
                     width: gap,
                     height: height
                 )
-                dlog("NotchGeometry: fiziksel çentik rect=\(rect)")
+                dlog("NotchGeometry: physical notch rect=\(rect)")
                 return NotchInfo(notchRect: rect, hasPhysicalNotch: true, screen: screen)
             }
         }

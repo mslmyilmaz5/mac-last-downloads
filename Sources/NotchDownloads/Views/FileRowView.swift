@@ -50,16 +50,16 @@ struct FileRowView: View {
 
             if isHovering {
                 HStack(spacing: 4) {
-                    QuickActionButton(systemName: "folder", help: "Finder'da Göster") {
+                    QuickActionButton(systemName: "folder", help: "Show in Finder") {
                         viewModel.reveal(file)
                     }
-                    QuickActionButton(systemName: "doc.on.doc", help: "Kopyala") {
+                    QuickActionButton(systemName: "doc.on.doc", help: "Copy") {
                         viewModel.copy(file)
                     }
-                    QuickActionButton(systemName: "square.and.arrow.up", help: "Paylaş…") {
+                    QuickActionButton(systemName: "square.and.arrow.up", help: "Share…") {
                         viewModel.share(file)
                     }
-                    QuickActionButton(systemName: "trash", help: "Çöp Kutusuna Taşı") {
+                    QuickActionButton(systemName: "trash", help: "Move to Trash") {
                         viewModel.trash(file)
                     }
                 }
@@ -82,13 +82,13 @@ struct FileRowView: View {
             file.dragItemProvider()
         }
         .contextMenu {
-            Button("Aç") { viewModel.open(file) }
-            Button("Finder'da Göster") { viewModel.reveal(file) }
+            Button("Open") { viewModel.open(file) }
+            Button("Show in Finder") { viewModel.reveal(file) }
             Divider()
-            Button("Kopyala") { viewModel.copy(file) }
-            Button("Paylaş…") { viewModel.share(file) }
+            Button("Copy") { viewModel.copy(file) }
+            Button("Share…") { viewModel.share(file) }
             Divider()
-            Button("Çöp Kutusuna Taşı", role: .destructive) { viewModel.trash(file) }
+            Button("Move to Trash", role: .destructive) { viewModel.trash(file) }
         }
     }
 }

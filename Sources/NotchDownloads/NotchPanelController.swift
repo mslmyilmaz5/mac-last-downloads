@@ -88,7 +88,7 @@ final class NotchPanelController: NSObject {
 
         if animated {
             NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.32
+                context.duration = viewModel.layoutDuration
                 context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                 panel.animator().setFrame(target, display: true)
             }
@@ -103,22 +103,23 @@ final class NotchPanelController: NSObject {
 
         switch state {
         case .idle:
+            let chin = viewModel.chinHeight
             if notch.hasPhysicalNotch {
                 // Çentiğin üzerine bin (siyah üstüne siyah = görünmez) ve altına
                 // küçük bir dilim sarkıt → çentikle tek parça hissi.
                 return CGRect(
                     x: notch.notchRect.minX,
-                    y: notch.notchRect.minY - NotchLayout.idleChinHeight,
+                    y: notch.notchRect.minY - chin,
                     width: notch.notchRect.width,
-                    height: notch.notchRect.height + NotchLayout.idleChinHeight
+                    height: notch.notchRect.height + chin
                 )
             }
-            let size = NotchLayout.fallbackChinSize
+            let width = NotchLayout.fallbackChinSize.width
             return CGRect(
-                x: notch.centerX - size.width / 2,
-                y: topY - size.height,
-                width: size.width,
-                height: size.height
+                x: notch.centerX - width / 2,
+                y: topY - chin,
+                width: width,
+                height: chin
             )
 
         case .peek:

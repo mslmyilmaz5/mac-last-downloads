@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>tr</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>Notch Downloads</string>
 	<key>CFBundleExecutable</key>
@@ -17,19 +17,19 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.0</string>
+	<string>1.2.0</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSDesktopFolderUsageDescription</key>
-	<string>Masaüstüne kaydedilen ekran görüntülerini çentiğin altında gösterebilmek için Masaüstü klasörüne erişim gerekiyor.</string>
+	<string>Notch Downloads needs access to your Desktop to show screenshots saved there under the notch.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
-	<string>Belgeler klasörüne kaydedilen ekran görüntülerini çentiğin altında gösterebilmek için erişim gerekiyor.</string>
+	<string>Notch Downloads needs access to your Documents folder to show screenshots saved there under the notch.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
-	<string>Son indirilen dosyaları çentiğin altında gösterebilmek için İndirilenler klasörüne erişim gerekiyor.</string>
+	<string>Notch Downloads needs access to your Downloads folder to show recent files under the notch.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

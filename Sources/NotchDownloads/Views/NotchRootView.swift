@@ -28,53 +28,142 @@ struct NotchRootView: View {
             .transition(.opacity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onHover { viewModel.setHovering($0) }
+        .clipShape(panelShape)
+        .onHover { hovering in
+            viewModel.setHovering(hovering)
+            syncIdleCursor()
+        }
+        .onChange(of: viewModel.state) { _ in
+            syncIdleCursor()
+        }
+        .onDisappear {
+            NSCursor.arrow.set()
+        }
+        .animation(.easeOut(duration: 0.2), value: viewModel.isHovering)
         .animation(.easeOut(duration: 0.18), value: viewModel.state)
         // Cam (Material) her zaman koyu görünsün; açık sistem temasında beyaza dönmesin.
         .preferredColorScheme(.dark)
     }
 
+    /// Kapalı çene tıklanabilir; imleç bunu el olarak gösterir.
+    private func syncIdleCursor() {
+        if viewModel.isHovering, case .idle = viewModel.state {
+            NSCursor.pointingHand.set()
+        } else {
+            NSCursor.arrow.set()
+        }
+    }
+
+    private var isOpen: Bool {
+        if case .idle = viewModel.state { return false }
+        return true
+    }
+
     private var panelShape: UnevenRoundedRectangle {
         UnevenRoundedRectangle(
-            topLeadingRadius: 0,
-            bottomLeadingRadius: cornerRadius,
-            bottomTrailingRadius: cornerRadius,
-            topTrailingRadius: 0
+            topLeadingRadius: isOpen ? NotchLayout.openCornerRadius : 0,
+            bottomLeadingRadius: isOpen ? NotchLayout.openCornerRadius : (viewModel.isHovering ? 11 : 7),
+            bottomTrailingRadius: isOpen ? NotchLayout.openCornerRadius : (viewModel.isHovering ? 11 : 7),
+            topTrailingRadius: isOpen ? NotchLayout.openCornerRadius : 0
         )
+    }
+
+    private var notchWidth: CGFloat {
+        NotchGeometry.current()?.notchWidth ?? NotchLayout.fallbackChinSize.width
     }
 
     @ViewBuilder
     private var panelBackground: some View {
-        if case .idle = viewModel.state {
+        if isOpen {
+            // Saydam cam. Üst kenarın ortası çentiğe yapışık kaldığı için
+            // parlak çizgi yalnızca sol üst ve sağ üst omuzda görünür.
+            panelShape
+                .fill(.ultraThinMaterial)
+                .overlay(panelShape.fill(Color.black.opacity(0.16)))
+                .overlay(
+                    panelShape.strokeBorder(Color.white.opacity(0.14), lineWidth: 0.5)
+                )
+                .overlay {
+                    panelShape
+                        .strokeBorder(Color.white.opacity(0.92), lineWidth: 1)
+                        .mask(
+                            TopShoulderMask(
+                                radius: NotchLayout.openCornerRadius,
+                                notchWidth: notchWidth
+                            )
+                        )
+                }
+        } else {
             // Çentiğin üzerinde: mat siyah — kamera bölmesiyle bütünleşik kalmalı.
             panelShape.fill(Color(white: 0.02))
-        } else {
-            // Açık durum: koyu cam + hafif karartma + ince border.
-            panelShape
-                .fill(.regularMaterial)
-                .overlay(panelShape.fill(Color.black.opacity(0.30)))
-                .overlay(panelShape.strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5))
         }
-    }
-
-    private var cornerRadius: CGFloat {
-        if case .idle = viewModel.state { return 7 }
-        return 14
     }
 
     /// Kapalı durum: pencere çentiği kaplar (siyah üstüne siyah, görünmez);
     /// yalnızca alttaki dilimde küçük bir indirme ikonu görünür.
+    /// Hover çeneyi biraz uzatır; liste tıklayınca açılır.
     private var idleContent: some View {
         VStack(spacing: 0) {
             Spacer(minLength: 0)
-            Image(systemName: "arrow.down")
-                .font(.system(size: 8, weight: .bold))
-                .foregroundStyle(.white.opacity(0.5))
-                .frame(height: NotchLayout.idleChinHeight)
+            ZStack(alignment: .bottom) {
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0),
+                        Color.white.opacity(viewModel.isHovering ? 0.1 : 0)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                Image(systemName: "arrow.down")
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundStyle(.white.opacity(viewModel.isHovering ? 0.95 : 0.38))
+                    .padding(.bottom, viewModel.isHovering ? 7 : 3)
+                Capsule()
+                    .fill(Color.white.opacity(viewModel.isHovering ? 0.9 : 0))
+                    .frame(width: viewModel.isHovering ? 28 : 10, height: 2)
+                    .padding(.bottom, 3)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: NotchLayout.idleChinHoverHeight)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
         .onTapGesture { viewModel.expand() }
+    }
+}
+
+/// Açık panelde sol üst ve sağ üst köşe çizgisini maskeler.
+/// Çentiğin tam altındaki düz kenar boş kalır; çizgi köşeye doğru belirginleşir.
+private struct TopShoulderMask: View {
+    var radius: CGFloat
+    var notchWidth: CGFloat
+
+    var body: some View {
+        GeometryReader { geo in
+            let shoulder = min(
+                geo.size.width / 2,
+                max(radius + 16, (geo.size.width - notchWidth) / 2)
+            )
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    LinearGradient(
+                        colors: [.white, .white, .clear],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: shoulder)
+                    Spacer(minLength: 0)
+                    LinearGradient(
+                        colors: [.clear, .white, .white],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: shoulder)
+                }
+                .frame(height: radius + 28)
+                Spacer(minLength: 0)
+            }
+        }
     }
 }
 
@@ -92,7 +181,7 @@ struct PeekView: View {
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .truncationMode(.middle)
-                Text("\(file.isScreenshot ? "Ekran görüntüsü" : "İndirildi") · \(file.formattedSize)")
+                Text("\(file.isScreenshot ? "Screenshot" : "Downloaded") · \(file.formattedSize)")
                     .font(.system(size: 10.5))
                     .foregroundStyle(.white.opacity(0.55))
                     .lineLimit(1)
@@ -134,7 +223,7 @@ struct ExpandedListView: View {
 
     private var header: some View {
         HStack {
-            Text("SON İNDİRİLENLER")
+            Text("RECENT DOWNLOADS")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(.white.opacity(0.4))
                 .kerning(0.8)
@@ -147,14 +236,14 @@ struct ExpandedListView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .help("İndirilenler Klasörünü Aç")
+            .help("Open Downloads Folder")
         }
         .padding(.horizontal, 14)
         .frame(height: 28)
     }
 
     private var emptyView: some View {
-        Text("İndirilenler klasöründe dosya yok")
+        Text("No files in Downloads")
             .font(.system(size: 11.5))
             .foregroundStyle(.white.opacity(0.45))
             .frame(maxWidth: .infinity)
@@ -163,15 +252,15 @@ struct ExpandedListView: View {
 
     private var permissionView: some View {
         VStack(spacing: 8) {
-            Text("İndirilenler klasörüne erişim izni gerekli")
+            Text("Downloads folder access is required")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(.white.opacity(0.85))
 
             HStack(spacing: 8) {
-                Button("Sistem Ayarları'nı Aç") {
+                Button("Open System Settings") {
                     viewModel.openPrivacySettings()
                 }
-                Button("Yeniden Dene") {
+                Button("Try Again") {
                     viewModel.retryAccess()
                 }
             }

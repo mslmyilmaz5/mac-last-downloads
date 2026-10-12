@@ -30,20 +30,21 @@ Ardından gelen İndirilenler klasörü iznini **İzin Ver** ile onaylayın.
 ## Özellikler
 
 - **Çentik altında ince bir "çene"**: Boştayken çentiğin doğal bir uzantısı gibi durur,
-  fareyi üzerine getirince (veya tıklayınca) genişler.
+  fareyi üzerine getirince hafifçe vurgulanır, tıklayınca genişler.
 - **Anlık bildirim**: Yeni bir dosya indiğinde çentiğin altında birkaç saniyelik
   önizleme bandı belirir.
 - **Son 5 dosya**: İndirilme tarihine göre sıralı, gerçek dosya ikonlarıyla.
 - **Sürükle & bırak**: Satırı — ya da yeni dosya bildirimini, listeyi açmadan —
   tutup Finder'a, terminale veya herhangi bir uygulamaya sürükleyebilirsiniz.
-- **Hızlı aksiyonlar**: Satırın üzerine gelince Finder'da Göster, Kopyala, Paylaş,
-  Çöp Kutusuna Taşı düğmeleri belirir. Sağ tık menüsünde de tüm aksiyonlar vardır.
+- **Hızlı aksiyonlar**: Satırın üzerine gelince Show in Finder, Copy, Share,
+  Move to Trash düğmeleri belirir. Sağ tık menüsünde de tüm aksiyonlar vardır.
 - **Yarım indirmeleri gizler**: `.download`, `.crdownload`, `.part` gibi devam eden
   indirmeler listede görünmez; dosya tamamlanınca belirir.
 - **Ekran görüntüleri**: macOS'un ekran görüntüsü klasörü (varsayılan Masaüstü) de izlenir;
-  yalnızca ekran görüntüsü/kaydı dosyaları listeye girer. Menüden **"Ekran Görüntülerini
-  Anında Göster"** açılırsa sistemin yüzen küçük resmi kapatılır ve görüntü çekildiği anda
+  yalnızca ekran görüntüsü/kaydı dosyaları listeye girer. Menüden **"Show Screenshots
+  Instantly"** açılırsa sistemin yüzen küçük resmi kapatılır ve görüntü çekildiği anda
   çentikte belirir. (Masaüstü izni de istenir.)
+- **İngilizce arayüz**: Menü, panel ve izin metinleri İngilizce.
 - **Menü çubuğu ikonu**: Paneli açma, oturum açılışında başlatma, çıkış.
 - Çentiksiz ekranlarda (harici monitör) menü çubuğunun altına ortalanmış olarak çalışır.
 
@@ -63,7 +64,7 @@ Bu komut uygulamayı derler, `dist/NotchDownloads.app` paketini oluşturur ve ba
 
 İlk çalıştırmada macOS **"NotchDownloads, İndirilenler klasörünüzdeki dosyalara
 erişmek istiyor"** diye sorar — **İzin Ver** deyin. İzin reddedilirse panel içinden
-"Sistem Ayarları'nı Aç" düğmesiyle izin verebilirsiniz.
+"Open System Settings" düğmesiyle izin verebilirsiniz.
 
 ### Geliştirme sırasında izin döngüsünden kaçınma
 
@@ -83,7 +84,7 @@ olduğu İndirilenler iznini miras alır ve her derlemede yeniden sormaz.
 make install   # /Applications altına kopyalar
 ```
 
-Ardından menü çubuğu ikonundan **"Oturum Açılışında Başlat"** seçeneğini açın.
+Ardından menü çubuğu ikonundan **"Launch at Login"** seçeneğini açın.
 
 ## Kaldırma
 
